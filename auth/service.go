@@ -45,13 +45,5 @@ func (s *jwtService) ValidateToken(encodedToken string) (*jwt.Token, error) {
 	}
 
 	return token, nil
-	// return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-	// 	_, ok := token.Method.(*jwt.SigningMethodHMAC)
 
-	// 	if !ok {
-	// 		return nil, jwt.ErrSignatureInvalid
-	// 	}
-
-	// 	return []byte(SECRET_KEY), nil
-	// })
 }

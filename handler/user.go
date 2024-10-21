@@ -142,7 +142,9 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	ext := filepath.Ext(file.Filename)
 
 	// Hardcode userID, seharusnya didapat dari JWT atau session
-	userID := 1
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := int(currentUser.ID)
 
 	// Generate nama file baru dengan kombinasi userID dan timestamp
 	timestamp := time.Now().UnixNano()
