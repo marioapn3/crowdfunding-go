@@ -3,7 +3,10 @@ package handler
 import (
 	"crowdfunding/helper"
 	"crowdfunding/user"
+	"fmt"
 	"net/http"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -108,7 +111,48 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 
 	response := helper.ApiResponse(metaMessage, http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
+}
 
-	// response := helper.ApiResponse("Email address ", http.StatusOK, "success", isEmailAvailable)
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// Dapatkan ekstensi file
+	ext := filepath.Ext(file.Filename)
+
+	// Hardcode userID, seharusnya didapat dari JWT atau session
+	userID := 1
+
+	// Generate nama file baru dengan kombinasi userID dan timestamp
+	timestamp := time.Now().UnixNano()
+	newFileName := fmt.Sprintf("%d_%d%s", userID, timestamp, ext)
+	path := "images/" + newFileName
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// harusnya dapat dari jwt namun karena belum ada jwt maka hardcode dulu
+	_, err = h.userService.SaveAvatar(userID, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.ApiResponse("Avatar successfuly uploaded", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
 
 }
