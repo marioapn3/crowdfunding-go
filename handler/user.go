@@ -138,19 +138,19 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	// Dapatkan ekstensi file
-	ext := filepath.Ext(file.Filename)
-
-	// Hardcode userID, seharusnya didapat dari JWT atau session
-
+	// get current user dari middleware context
 	currentUser := c.MustGet("currentUser").(user.User)
 	userID := int(currentUser.ID)
 
-	// Generate nama file baru dengan kombinasi userID dan timestamp
+	// ambil file extension
+	ext := filepath.Ext(file.Filename)
+	// generate nama file baru pakai user_id dan timestamp
 	timestamp := time.Now().UnixNano()
 	newFileName := fmt.Sprintf("%d_%d%s", userID, timestamp, ext)
 	path := "images/" + newFileName
 
+	// simpan file ke folder "images/"
+	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
 		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
@@ -158,7 +158,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	// harusnya dapat dari jwt namun karena belum ada jwt maka hardcode dulu
+	// save path file ke database
 	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
