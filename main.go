@@ -27,15 +27,15 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+	campaignService := campaign.NewService(campaignRepository)
 
-	campaigns, err := campaignRepository.FindByUserId(1)
-	fmt.Println("debug")
-	fmt.Println("debug")
+	campaign, err := campaignService.FindCampaigns(1)
 
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		fmt.Println(campaign.CampaignImages[0].FileName)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	fmt.Println(len(campaign))
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
