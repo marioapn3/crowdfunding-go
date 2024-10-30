@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	dsn := "host=localhost user=postgres password=315241bb dbname=crowd_funding port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=localhost user=postgres password=315241bb dbname=crowd_funding port=5432 sslmode=disable TimeZone=Asia/Jakarta"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -62,6 +62,8 @@ func main() {
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadCampaignImage)
 
 	api.GET("campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTractions)
+	api.GET("transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
+	api.POST("transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	router.Run()
 }
 
